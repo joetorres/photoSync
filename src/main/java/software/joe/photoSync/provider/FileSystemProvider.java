@@ -1,6 +1,8 @@
 package software.joe.photoSync.provider;
 
 import org.apache.commons.io.FileUtils;
+import software.joe.photoSync.io.FileHelper;
+import software.joe.photoSync.model.ProviderType;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,10 +12,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class FileSystemProvider implements IProvider {
+public class FileSystemProvider extends BaseProvider {
     private final String directoryPath;
 
     public FileSystemProvider(String directoryPath) {
+        super(ProviderType.FileSystem);
         this.directoryPath = directoryPath;
     }
 
@@ -43,12 +46,16 @@ public class FileSystemProvider implements IProvider {
     }
 
     @Override
-    public boolean DownloadFile(String filePath, String destinationFolder) {
+    public String DownloadFile(String filePath, String destinationFolder) {
+        Path origin = Path.of(filePath);
+        Path destiny = Path.of(destinationFolder);
+        destiny = destiny.resolve(origin.getFileName());
+
         try {
-            Files.copy(Path.of(filePath), Path.of(destinationFolder));
-            return true;
+            Files.copy(origin, destiny);
+            return destiny.resolve(FileHelper.getFileName(filePath)).toAbsolutePath().toString();
         } catch (IOException e) {
-            return false;
+            return "";
         }
     }
 }

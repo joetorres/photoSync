@@ -20,7 +20,7 @@ public class DatabaseSetup {
             Connection con = DB.getDataBase();
 
             PreparedStatement statement = con.prepareStatement("CREATE TABLE IF NOT EXISTS media ( " +
-                    "hash TEXT PRIMARY KEY, originalFilePath TEXT, provider INTEGER );");
+                    "fileHash TEXT PRIMARY KEY, originalFilePath TEXT, provider INTEGER );");
 
             statement.execute();
             con.close();
