@@ -11,7 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class DatabaseSetup {
-    public static void Initialize() {
+    public static void Initialize(  ) {
 
         try {
             Path appDataDir = Paths.get(Constants.appDataDirectory);

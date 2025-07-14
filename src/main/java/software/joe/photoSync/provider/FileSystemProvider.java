@@ -53,7 +53,7 @@ public class FileSystemProvider extends BaseProvider {
 
         try {
             Files.copy(origin, destiny);
-            return destiny.resolve(FileHelper.getFileName(filePath)).toAbsolutePath().toString();
+            return destiny.toAbsolutePath().toString();
         } catch (IOException e) {
             return "";
         }

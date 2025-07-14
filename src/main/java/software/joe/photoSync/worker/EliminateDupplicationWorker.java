@@ -6,6 +6,7 @@ import software.joe.photoSync.model.Media;
 import software.joe.photoSync.model.ProviderType;
 import software.joe.photoSync.provider.BaseProvider;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,23 +38,34 @@ public class EliminateDupplicationWorker implements IWorker {
             ArrayList<String> allFiles = p.ListFiles();
 
             for(String f : allFiles) {
+                System.out.println("found the file '" + f + "'");
                String tmpFile = p.DownloadFile(f, this.tempFolderPath);
                 try {
+                    String hash = FileHelper.getMD5Checksum(tmpFile);
+                    System.out.println("File MD5 hash: '" + hash + "'");
                     Media media = new Media(
-                            FileHelper.getMD5Checksum(tmpFile),
+                            hash,
                             f,
                             p.getProviderType(),
                             FileHelper.getFileExtension(f));
 
                     //see if file already exists
                     if(!db.fileAlreadyExists(media.fileHash())) {
+                        System.out.println("File '" + f + "' is new!");
                         //log the file
                         db.LogFile(media);
-
                         //move the file
                         FileHelper.MoveFile(tmpFile, destinationFolderPath, media);
                     }
-                } catch (Exception ignored) { }
+                    else {
+                        System.out.println("File '" + f + "' already exists! Deleting...");
+                        //if already exists, delete the original
+                        p.DeleteFile(f);
+                        Files.delete(Path.of(tmpFile));
+                    }
+                } catch (Exception ex) {
+                    System.out.println("Exception: " + ex.getMessage());
+                }
             }
         }
     }
